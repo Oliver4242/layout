@@ -1,0 +1,9 @@
+Package: layout
+Type: Package
+Title: (Multilevel) layout algorithms for graph drawing
+Version: 0.01
+Date: 2014-04-23
+Author: Oliver Dürr
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
