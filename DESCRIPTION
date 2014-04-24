@@ -7,4 +7,4 @@ Author: Oliver Dürr
 Maintainer: Oliver Dürr <oliver.duerr@zhaw.ch>
 Description: Serveral (multi-) level graph drawing algorithms
 License: What license is it under?
-Depends: R (>= 2.9.0), igraph(>= 0.7.0)
+Depends: R (>= 2.9.0), igraph(>= 0.7.0), rJava(>= 0.9)

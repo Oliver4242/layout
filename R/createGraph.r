@@ -29,7 +29,7 @@ WIDTH  = 1600
 #' g <- barabasi.game(100, directed=FALSE)
 #' res <- doMultilevelLayout(g)
 #' plot(g, layout=res$layouts[[1]])
-#' #TODO create example with a valiud file
+#' doMultilevelLayout(g, file='tmp/dumm04%d.png')
 doMultilevelLayout <- function(g, file=NULL, verb=FALSE, iter=1000, RMSMIN=NA) {
   set.seed(1) 
   tic <- proc.time()[3]

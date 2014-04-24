@@ -40,7 +40,7 @@ graph).
 g <- barabasi.game(100, directed=FALSE)
 res <- doMultilevelLayout(g)
 plot(g, layout=res$layouts[[1]])
-#TODO create example with a valiud file
+doMultilevelLayout(g, file='tmp/dumm04\%d.png')
 }
 \author{
 Oliver D\"urr \email{oliver.duerr@zhaw.ch}
