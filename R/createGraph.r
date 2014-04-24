@@ -11,7 +11,8 @@ WIDTH  = 1600
 #' @param verb if \code{TRUE} prints out debug information
 #' @param iter the number of iterations of the inner algorithm
 #' @param RMSMIN stops the layout in a certain level if the RMS differences are below the threshold given by \code{RMSMIN}
-#' @param file if not \code{NULL} a pngs of are created during the layout-process. 
+#' @param file if not \code{NULL} a pngs of are created during the layout-process.
+#' @param the method using the inner layout either "prefuse" or "fr" 
 #' @return A result object including the graphs and the layouts for the different levels
 #' 
 #' @details In the first stage the graph is decomposed into a series of smaller graphs using the
@@ -30,7 +31,7 @@ WIDTH  = 1600
 #' res <- doMultilevelLayout(g)
 #' plot(g, layout=res$layouts[[1]])
 #' doMultilevelLayout(g, file='tmp/dumm04%d.png')
-doMultilevelLayout <- function(g, file=NULL, verb=FALSE, iter=1000, RMSMIN=NA) {
+doMultilevelLayout <- function(g, file=NULL, verb=FALSE, iter=1000, RMSMIN=NA, method="prefuse") {
   set.seed(1) 
   tic <- proc.time()[3]
   if (verb) print("Multi Level Layouter:: Detecting communities ...")
@@ -54,7 +55,7 @@ doMultilevelLayout <- function(g, file=NULL, verb=FALSE, iter=1000, RMSMIN=NA) {
       print(paste(" Layout iteration in level ", k, " : ", sep=""))
     }
     g.cur <- graphs[[k]]
-    ret <- createNewLayoutLevel(g.cur=g.cur, members=wt$memberships, k=k-1, l=l, verb=verb, debug=TRUE, iter=iter, RMSMIN=RMSMIN, plot = !is.null(file))
+    ret <- createNewLayoutLevel(g.cur=g.cur, members=wt$memberships, k=k-1, l=l, verb=verb, debug=TRUE, iter=iter, RMSMIN=RMSMIN, plot = !is.null(file), method=method)
     l <- ret$layout #Needed for the next iter
     layouts[[k]] <- l;
     areas[[k]] <- ret$area
@@ -216,11 +217,17 @@ plotGraph <- function(g, l, com, k, rms) {
 # iter    the number of iterations (maximum)
 # RMSMIN  the root-mean-square, if below this value the algorithm stops earlier
 # plot    if true a plot is made
-createNewLayoutLevel <- function(g.cur, members, k, l, verb=verb, debug=FALSE, iter=100, RMSMIN=NA, plot=FALSE) {
+createNewLayoutLevel <- function(g.cur, members, k, l, verb=verb, debug=FALSE, iter=100, RMSMIN=NA, plot=FALSE, method) {
   ############     Remove
   blocksize = iter
   #iter = 3000
   java = FALSE
+  if (method == "prefuse") {
+    java = TRUE
+    if (verb) {
+      print("Using prefuse library")
+    }
+  }
   #if (k > 3) {iter = iter * 3}
   ############     Remove (End)
   

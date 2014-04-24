@@ -3,7 +3,7 @@
 \title{Creates a hierarchy of layouted graphs}
 \usage{
 doMultilevelLayout(g, file = NULL, verb = FALSE, iter = 1000,
-  RMSMIN = NA)
+  RMSMIN = NA, method = "prefuse")
 }
 \arguments{
   \item{g}{the igraph graph object}
@@ -19,6 +19,9 @@ doMultilevelLayout(g, file = NULL, verb = FALSE, iter = 1000,
 
   \item{file}{if not \code{NULL} a pngs of are created
   during the layout-process.}
+
+  \item{the}{method using the inner layout either "prefuse"
+  or "fr"}
 }
 \value{
 A result object including the graphs and the layouts for

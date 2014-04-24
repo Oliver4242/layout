@@ -5,11 +5,11 @@
 #' 
 #' @param g the igraph graph object
 #' @param verb if \code{TRUE} prints out debug information
-#' @param iter the number of iterations of the inner algorithm
-#' @return A layouts 
+#' @param iter the number of iterations 
+#' @return A layout 
 #' 
 #' @references
-#' \url{http://arxiv.org/abs/1207.6282}
+#' \url{https://github.com/prefuse/Prefuse}
 #' 
 #' @author Oliver D\"urr \email{oliver.duerr@@zhaw.ch}
 
