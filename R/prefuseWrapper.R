@@ -3,11 +3,13 @@
 #' Wrapper for prefuse library 
 #'
 #' 
-#' @param g the igraph graph object
+#' @param graph the igraph graph object
 #' @param verb if \code{TRUE} prints out debug information 
 #' @param iter the number of iterations 
 #' @param pos the intial prositions
 #' @param graConst if > 0 an additonal gravitational force is used
+#' @param steps internal paramter of the prefuse force integrator
+#' @param parameters for the virtual machine
 #' @return A layout 
 #' 
 #' @references
@@ -17,11 +19,12 @@
 
 #' 
 #' @examples
-#' 
+#' \dontrun{
 #' # Simple force-directed layout 
 #' g <- barabasi.game(100, directed=FALSE)
 #' l <- layout.prefuse(g, iter=100)
 #' # plot(g, layout=l)
+#' }
 layout.prefuse <- function(graph, pos=NULL, iter, verb=TRUE, graConst=5e-6, steps=10, parameters="-Xmx1500m"){
   el <- get.edgelist(graph)
   nV <- vcount(graph)

@@ -7,12 +7,12 @@ WIDTH  = 1600
 #'
 #' Creates a 2-dimensional layout (placement of the nodes) of a graph using a multilevel approach (see details below).
 #' 
-#' @param g the igraph graph object
+#' @param graph the igraph graph object
 #' @param verb if \code{TRUE} prints out debug information
 #' @param iter the number of iterations of the inner algorithm
 #' @param RMSMIN stops the layout in a certain level if the RMS differences are below the threshold given by \code{RMSMIN}
 #' @param file if not \code{NULL} a pngs of are created during the layout-process.
-#' @param the method using the inner layout either "prefuse" or "fr" 
+#' @param method method for the inner layout, either "prefuse" or "fr" 
 #' @param mlInfo if true information such as the intermediate levels of the layout are returned
 #' @return A result object including the graphs and the layouts for the different levels
 #' 
@@ -27,11 +27,13 @@ WIDTH  = 1600
  
 #' 
 #' @examples
+#' \dontrun{
 #' # Simple example of a barabasi game
 #' g <- barabasi.game(100, directed=FALSE)
-#' res <- layout.multi.level(g)
+#' res <- layout.multi.level(graph=g)
 #' plot(g, layout=res, vertex.size=3, vertex.label=NA)
 #' layout.multi.level(g, file='tmp/dumm04%d.png')
+#' }
 layout.multi.level <- function(graph, file=NULL, verb=FALSE, iter=1000, RMSMIN=NA, method="prefuse", mlInfo=FALSE) {
   if (method != "prefuse" && method != "fr") {
     print(paste("Warning: invalide method ", method, " using prefuse."));
@@ -40,16 +42,16 @@ layout.multi.level <- function(graph, file=NULL, verb=FALSE, iter=1000, RMSMIN=N
   set.seed(1) 
   tic <- proc.time()[3]
   if (verb) print("Multi Level Layouter:: Detecting communities ...")
-  wt <- multilevel.community(g, weights=NA) #TODO Check why it is not working with weight
+  wt <- multilevel.community(graph, weights=NA) #TODO Check why it is not working with weight
   if (verb) print(paste("   found ", dim(wt$memberships)[1], "  levels of communities in ", round((proc.time()[3] - tic),5),  sep=""));
-  graphs <- createMLGraphs(g, wt, verb);
+  graphs <- createMLGraphs(graph, wt, verb);
   levels <- dim(wt$memberships)[1]
   layouts <- vector("list", levels + 1) 
   areas <- vector("list", levels + 1)
   RMSs  <- vector("list", levels + 1)
   if (levels == 0) levels = 1
   par(mfrow = c(1,1) )
-  if (is.null(file) == FALSE) png(file=file, width=WIDTH, height=HEIGHT)
+  if (is.null(file) == FALSE) png(filename=file, width=WIDTH, height=HEIGHT)
   l <- NULL;
   if (verb) {
     print("---------------- Creation of Layout ----------")
@@ -78,7 +80,6 @@ layout.multi.level <- function(graph, file=NULL, verb=FALSE, iter=1000, RMSMIN=N
 # 1 The original
 # After the first level
 createMLGraphs <- function(g, wt, verb=TRUE) {
-  #createNewGraphLevel.cmp <- cmpfun(createNewGraphLevel)
   levels <- dim(wt$memberships)[1]
   graphs <- vector("list", levels + 1)
   graphs[[1]] <- g
@@ -119,7 +120,7 @@ condensedSum <- function(adjec, com, num.com) {
 
 ######################################################
 # Creates a new graph 
-createNewGraphLevel <- function(k=1, members = wt$memberships, g.cur, verb=FALSE) {
+createNewGraphLevel <- function(k=1, members, g.cur, verb=FALSE) {
   tic <- proc.time()[3]
   # Communities in the old graph
   com <- members[k,]        # The communities in the current level, indices refer to the orignal graph
@@ -141,7 +142,7 @@ createNewGraphLevel <- function(k=1, members = wt$memberships, g.cur, verb=FALSE
   for (i in 1:dim(el)[1]){
     if (com[el[i,1]] == com[el[i,2]]) {
       com.cur <- com[el[i,1]]
-      if (k > 1 | is.weighted(g)) {  #TODO put into outer loop
+      if (k > 1 | is.weighted(g.cur)) {  #TODO put into outer loop
         e.weights[com.cur] <- e.weights[com.cur] + e.cur[i]$weight
       } else{
         e.weights[com.cur] <- e.weights[com.cur] + 1  
@@ -168,7 +169,7 @@ createNewGraphLevel <- function(k=1, members = wt$memberships, g.cur, verb=FALSE
       if (verb) {setTxtProgressBar(pb, i)}
       com.i <- com.idxs[[i]]; #which(com == i);             Indices der Vertices, die zur gewuenschten Community gehoeren.
       weights  <- 0;
-      if (k > 1 | is.weighted(g)) { 
+      if (k > 1 | is.weighted(g.cur)) { 
         weights  <- sum(V(g.cur)[com.i]$weight)
       }
       vertex.weights[i] <- weights + 2 * e.weights[i] ### The weight of these meta-vertices is given by the sum of the weights of the previous graph plus twice the sum of the edge weights inside the community
@@ -283,7 +284,7 @@ createNewLayoutLevel <- function(g.cur, members, k, l, verb=verb, debug=FALSE, i
     
     if (debug) {
       if (verb) print(paste("   Using  layout (from level ) ", k , " x[", min(l[,1]), " ", max(l[,1]), "] y[", min(l[,1]), " ", max(l[,2]), "]", sep = ""))
-      if (verb) print(paste("   Graph  is weighted?", is.weighted(g), sep=""))
+      if (verb) print(paste("   Graph  is weighted?", is.weighted(g.cur), sep=""))
       if (verb) print(paste("   Number of iteration blocks ", blocks, sep=""))
       if (verb) pb <- myTxtProgressBar(min = 0.999, max = blocks, style = 3, file=stderr())
       for (i in 1:blocks) {

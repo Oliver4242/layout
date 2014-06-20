@@ -3,12 +3,10 @@
 \alias{layout}
 \docType{package}
 \title{
-What the package does (short line)
-~~ package title ~~
+(Multilevel) layout algorithms for graph drawing. 
 }
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
+  Algorithms for fast drawing of undirected graphs using force directed layouts optinally with a multi-scale approach.
 }
 \details{
 \tabular{ll}{
@@ -16,25 +14,14 @@ Package: \tab layout\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
 Date: \tab 2014-04-23\cr
-License: \tab What license is it under?\cr
+License: \tab BSD\cr
 }
-~~ An overview of how to use the package, including the most important functions ~~
+ The package provides a wrapper for the prefuse-drawing algorithm (\url{http://prefuse.org/}) see 
+ \link{layout.prefuse}. Further a multi-scale graph drawing approach is also possible  \link{layout.multi.level}
 }
 \author{
-Who wrote it
-
-Maintainer: Who to complain to <yourfault@somewhere.net>
-~~ The author and/or maintainer of the package ~~
+Oliver D\"urr <oliver.duerr@zhaw.ch>
 }
 \references{
-~~ Literature or other references for background information ~~
-}
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~
-\keyword{ package }
-\seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
-\examples{
-~~ simple examples of the most important functions ~~
+  See: \url{http://arxiv.org/abs/1207.6282} for the multi-scale approach.
 }
