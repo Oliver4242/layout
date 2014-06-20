@@ -13,6 +13,7 @@ WIDTH  = 1600
 #' @param RMSMIN stops the layout in a certain level if the RMS differences are below the threshold given by \code{RMSMIN}
 #' @param file if not \code{NULL} a pngs of are created during the layout-process.
 #' @param the method using the inner layout either "prefuse" or "fr" 
+#' @param mlInfo if true information such as the intermediate levels of the layout are returned
 #' @return A result object including the graphs and the layouts for the different levels
 #' 
 #' @details In the first stage the graph is decomposed into a series of smaller graphs using the
@@ -22,16 +23,20 @@ WIDTH  = 1600
 #' @references
 #' \url{http://arxiv.org/abs/1207.6282}
 #' 
-#' @author Oliver D\"urr \email{oliver.duerr@@zhaw.ch}
+#' @author Oliver D\"urr \email{oliver.duerr@@zhaw.ch} 
  
 #' 
 #' @examples
 #' # Simple example of a barabasi game
 #' g <- barabasi.game(100, directed=FALSE)
-#' res <- doMultilevelLayout(g)
+#' res <- layout.multi.level(g)
 #' plot(g, layout=res$layouts[[1]])
-#' doMultilevelLayout(g, file='tmp/dumm04%d.png')
-doMultilevelLayout <- function(g, file=NULL, verb=FALSE, iter=1000, RMSMIN=NA, method="prefuse") {
+#' layout.multi.level(g, file='tmp/dumm04%d.png')
+layout.multi.level <- function(graph, file=NULL, verb=FALSE, iter=1000, RMSMIN=NA, method="prefuse", mlInfo=FALSE) {
+  if (method != "prefuse" && method != "fr") {
+    print(paste("Warning: invalide method ", method, " using prefuse."));
+    method = "prefuse"
+  }
   set.seed(1) 
   tic <- proc.time()[3]
   if (verb) print("Multi Level Layouter:: Detecting communities ...")
@@ -50,19 +55,23 @@ doMultilevelLayout <- function(g, file=NULL, verb=FALSE, iter=1000, RMSMIN=NA, m
     print("---------------- Creation of Layout ----------")
     print("Creating Layouts for the different levels  ...")
   }
+  if (is.null(file) == FALSE) dev.off()
   for (k in (levels+1):1) {
-    if (verb) {
-      print(paste(" Layout iteration in level ", k, " : ", sep=""))
-    }
-    g.cur <- graphs[[k]]
-    ret <- createNewLayoutLevel(g.cur=g.cur, members=wt$memberships, k=k-1, l=l, verb=verb, debug=TRUE, iter=iter, RMSMIN=RMSMIN, plot = !is.null(file), method=method)
-    l <- ret$layout #Needed for the next iter
-    layouts[[k]] <- l;
-    areas[[k]] <- ret$area
-    RMSs[[k]]  <- ret$RMS
+      if (verb) {
+        print(paste(" Layout iteration in level ", k, " : ", sep=""))
+      }
+      g.cur <- graphs[[k]]
+      ret <- createNewLayoutLevel(g.cur=g.cur, members=wt$memberships, k=k-1, l=l, verb=verb, debug=TRUE, iter=iter, RMSMIN=RMSMIN, plot = !is.null(file), method=method)
+      l <- ret$layout #Needed for the next iter
+      layouts[[k]] <- l;
+      areas[[k]] <- ret$area
+      RMSs[[k]]  <- ret$RMS
   }
-  dev.off()
-  return (list(layouts = layouts, graphs=graphs, members=wt$memberships, areas = areas, RMSs = RMSs));
+  if (mlInfo == FALSE) {
+    return(layouts[[1]])
+  } else{
+    return (list(layouts = layouts, graphs=graphs, members=wt$memberships, areas = areas, RMSs = RMSs));
+  }
 }
 
 # Creates a hierachy of graphs
@@ -292,7 +301,7 @@ createNewLayoutLevel <- function(g.cur, members, k, l, verb=verb, debug=FALSE, i
                 l <- layout.fruchterman.reingold(graph=g.cur, params=list(niter=blocksize, start=start, maxdelta=1));
             }
           } else {
-            l <- layout.prefuse(graph=g.cur, pos=start, iter=blocksize, verb=TRUE)
+            l <- layout.prefuse(graph=g.cur, pos=start, iter=blocksize, verb=verb)
           }
           area[i] <- max(l[,1]) - min(l[,1]) * max(l[,2]) - min(l[, 2])
           RMS[i]  <- sqrt(sum((l[,1] - start[,1])^2 * (l[,2] - start[,2])^2) / length(l))
@@ -305,7 +314,7 @@ createNewLayoutLevel <- function(g.cur, members, k, l, verb=verb, debug=FALSE, i
           }
       }
       if (verb) close(pb)
-    } else { #Not implemented yet all in one go
+    } else { #The all in one go is not implement yet
       print("------------      --------------------    Spring Layout ")
       l <- layout.spring(g.cur, params=list(niter=100,start=l.init))
       #l <- layout.kamada.kawai(graph=g.cur, params=list(niter=500));
@@ -323,7 +332,7 @@ createNewLayoutLevel <- function(g.cur, members, k, l, verb=verb, debug=FALSE, i
               l <- layout.fruchterman.reingold(g.cur, params=list(start=start, niter=blocksize, maxdelta=1))
           }
         } else {
-          l <- layout.prefuse(graph=g.cur, pos=start,iter=blocksize, verb=TRUE)
+          l <- layout.prefuse(graph=g.cur, pos=start,iter=blocksize, verb=verb)
         } 
         area[i] <- max(l[,1]) - min(l[,1]) * max(l[,2]) - min(l[, 2])
         if (is.null(start) == FALSE)  RMS[i]  <- sqrt(sum((l[,1] - start[,1])^2 * (l[,2] - start[,2])^2) / length(l))
