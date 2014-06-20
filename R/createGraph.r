@@ -30,7 +30,7 @@ WIDTH  = 1600
 #' # Simple example of a barabasi game
 #' g <- barabasi.game(100, directed=FALSE)
 #' res <- layout.multi.level(g)
-#' plot(g, layout=res$layouts[[1]])
+#' plot(g, layout=res, vertex.size=3, vertex.label=NA)
 #' layout.multi.level(g, file='tmp/dumm04%d.png')
 layout.multi.level <- function(graph, file=NULL, verb=FALSE, iter=1000, RMSMIN=NA, method="prefuse", mlInfo=FALSE) {
   if (method != "prefuse" && method != "fr") {

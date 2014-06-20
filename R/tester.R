@@ -1,4 +1,5 @@
 testPrefuse <- function() {
+  require(igraph)
   g <- barabasi.game(500, directed=FALSE)
   l <- layout.prefuse(g, iter=1000, verb=TRUE)
   wt <- multilevel.community(g)
@@ -7,6 +8,7 @@ testPrefuse <- function() {
 } 
 
 testMLPrefuse <- function() {
+  require(igraph)
   g <- barabasi.game(500, directed=FALSE)
   l <- layout.multi.level(graph=g, iter=1000, verb=TRUE, method="prefuse")
   #l <- layout.fruchterman.reingold(graph=g)
